@@ -1,0 +1,60 @@
+name: samity-khata
+
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    container_name: samity-khata-db
+    environment:
+      POSTGRES_DB: ${DB_NAME:?set DB_NAME in .env}
+      POSTGRES_USER: ${DB_USER:?set DB_USER in .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    ports:
+      - "${DB_HOST_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  embedding:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    container_name: samity-khata-embedding
+    command: ["--model-id", "intfloat/multilingual-e5-small"]
+    ports:
+      - "${EMBEDDING_HOST_PORT:-8080}:80"
+    volumes:
+      - embedding_cache:/data
+    restart: unless-stopped
+
+  api:
+    build: .
+    container_name: samity-khata-api
+    env_file:
+      - .env
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      EMBEDDING_URL: http://embedding:80
+      # Docker Desktop on Windows doesn't pass file change events into the container, so poll instead.
+      WATCHFILES_FORCE_POLLING: "true"
+    command: ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"]
+    volumes:
+      # Mount the project so code edits reach the container without a rebuild.
+      - .:/app
+      # Keep the container's own Linux virtualenv instead of your Windows .venv.
+      - /app/.venv
+    ports:
+      - "${API_HOST_PORT:-8002}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      embedding:
+        condition: service_started
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  embedding_cache:
