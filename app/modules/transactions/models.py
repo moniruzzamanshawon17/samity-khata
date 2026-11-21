@@ -38,6 +38,11 @@ class Transaction(Base):
             "(type = 'reversal') = (reverses_id IS NOT NULL)",
             name="ck_transactions_reversal_link",
         ),
+        CheckConstraint(
+            "(type <> 'repayment' OR loan_id IS NOT NULL)"
+            " AND (type NOT IN ('deposit', 'withdrawal') OR loan_id IS NULL)",
+            name="ck_transactions_loan_link",
+        ),
         Index("ix_transactions_member_id_occurred_on", "member_id", "occurred_on"),
     )
 
@@ -47,6 +52,9 @@ class Transaction(Base):
     amount_paisa: Mapped[int] = mapped_column(BigInteger)
     occurred_on: Mapped[date] = mapped_column(Date)
     recorded_by: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="RESTRICT"))
+    loan_id: Mapped[int | None] = mapped_column(
+        ForeignKey("loans.id", ondelete="RESTRICT"), index=True
+    )
     reverses_id: Mapped[int | None] = mapped_column(
         ForeignKey("transactions.id", ondelete="RESTRICT"), unique=True
     )

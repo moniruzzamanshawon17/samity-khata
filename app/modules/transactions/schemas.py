@@ -2,7 +2,7 @@ from datetime import date, datetime
 from enum import StrEnum
 from typing import Annotated
 
-from pydantic import AfterValidator, BaseModel, ConfigDict, Field
+from pydantic import AfterValidator, BaseModel, ConfigDict, Field, model_validator
 
 from app.modules.transactions.models import TransactionType
 
@@ -32,6 +32,7 @@ class TransactionCreate(BaseModel):
                 "type": "deposit",
                 "amount_paisa": 50000,
                 "occurred_on": "2026-11-21",
+                "loan_id": None,
             }
         }
     )
@@ -40,6 +41,17 @@ class TransactionCreate(BaseModel):
     type: NewTransactionType
     amount_paisa: int = Field(gt=0, description="Amount in paisa (1 taka = 100 paisa)")
     occurred_on: OccurredOn = Field(default_factory=date.today)
+    loan_id: int | None = Field(
+        default=None, gt=0, description="Required for a repayment; must be empty otherwise"
+    )
+
+    @model_validator(mode="after")
+    def loan_id_matches_type(self):
+        if self.type == NewTransactionType.REPAYMENT and self.loan_id is None:
+            raise ValueError("loan_id is required for a repayment")
+        if self.type != NewTransactionType.REPAYMENT and self.loan_id is not None:
+            raise ValueError("loan_id is only allowed for a repayment")
+        return self
 
 
 class TransactionRead(BaseModel):
@@ -51,6 +63,7 @@ class TransactionRead(BaseModel):
     amount_paisa: int
     occurred_on: date
     recorded_by: int
+    loan_id: int | None
     reverses_id: int | None
     reversed_by_id: int | None = Field(
         default=None, description="Id of the reversal row, if this transaction was reversed"

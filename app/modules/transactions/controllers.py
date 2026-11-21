@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Query, status
 from app.core.schemas import Page
 from app.db.session import SessionDep
 from app.modules.auth.dependencies import AdminUser, CurrentUser, StaffUser
+from app.modules.loans.repositories import LoanRepository
 from app.modules.members.dependencies import AccessibleMember
 from app.modules.members.repositories import MemberRepository
 from app.modules.transactions.models import Transaction
@@ -18,7 +19,9 @@ balance_router = APIRouter(prefix="/members", tags=["members"])
 
 
 def get_transaction_service(session: SessionDep) -> TransactionService:
-    return TransactionService(TransactionRepository(session), MemberRepository(session))
+    return TransactionService(
+        TransactionRepository(session), MemberRepository(session), LoanRepository(session)
+    )
 
 
 TransactionServiceDep = Annotated[TransactionService, Depends(get_transaction_service)]
@@ -29,8 +32,8 @@ TransactionServiceDep = Annotated[TransactionService, Depends(get_transaction_se
     response_model=TransactionRead,
     status_code=status.HTTP_201_CREATED,
     responses={
-        404: {"description": "Member not found"},
-        422: {"description": "Amount not positive, inactive member or insufficient balance"},
+        404: {"description": "Member or loan not found"},
+        422: {"description": "Bad amount, inactive member, insufficient balance or bad loan"},
     },
 )
 async def record_transaction(

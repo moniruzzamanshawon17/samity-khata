@@ -6,6 +6,9 @@ from sqlalchemy.exc import IntegrityError
 
 from app.core.schemas import Page
 from app.modules.auth.models import User, UserRole
+from app.modules.loans.models import Loan, LoanStatus
+from app.modules.loans.repositories import LoanRepository
+from app.modules.loans.services import figures_for, sync_status
 from app.modules.members.models import Member, MemberStatus
 from app.modules.members.repositories import MemberRepository
 from app.modules.transactions.models import Transaction, TransactionType
@@ -16,9 +19,12 @@ ALREADY_REVERSED = "This transaction has already been reversed"
 
 
 class TransactionService:
-    def __init__(self, repo: TransactionRepository, members: MemberRepository) -> None:
+    def __init__(
+        self, repo: TransactionRepository, members: MemberRepository, loans: LoanRepository
+    ) -> None:
         self.repo = repo
         self.members = members
+        self.loans = loans
 
     async def record(self, data: TransactionCreate, recorded_by: User) -> Transaction:
         member = await self.repo.lock_member(data.member_id)
@@ -29,7 +35,10 @@ class TransactionService:
 
         if data.type == TransactionType.WITHDRAWAL:
             await self._ensure_savings_cover(member, data.amount_paisa)
+        if data.type == TransactionType.REPAYMENT:
+            await self._apply_repayment(data.loan_id, member, data.amount_paisa)
 
+        # Saving commits the transaction and any loan status change together.
         return await self.repo.save(
             Transaction(
                 member_id=member.id,
@@ -37,6 +46,7 @@ class TransactionService:
                 amount_paisa=data.amount_paisa,
                 occurred_on=data.occurred_on,
                 recorded_by=recorded_by.id,
+                loan_id=data.loan_id,
             )
         )
 
@@ -53,6 +63,11 @@ class TransactionService:
         if original.type == TransactionType.DEPOSIT:
             # Taking a deposit back out must not leave the savings negative.
             await self._ensure_savings_cover(member, original.amount_paisa)
+        if original.type == TransactionType.REPAYMENT and original.loan_id is not None:
+            # Undoing a repayment raises what's owed, and may reopen a closed loan.
+            loan = await self.loans.get_for_update(original.loan_id)
+            repaid = await self._repaid(loan)
+            sync_status(loan, repaid - original.amount_paisa)
 
         try:
             return await self.repo.save(
@@ -62,6 +77,7 @@ class TransactionService:
                     amount_paisa=original.amount_paisa,
                     occurred_on=date.today(),
                     recorded_by=recorded_by.id,
+                    loan_id=original.loan_id,
                     reverses_id=original.id,
                 )
             )
@@ -123,6 +139,26 @@ class TransactionService:
                 status.HTTP_403_FORBIDDEN, "You can only view your own transactions"
             )
         return [member_id]
+
+    async def _apply_repayment(self, loan_id: int, member: Member, amount_paisa: int) -> None:
+        loan = await self.loans.get_for_update(loan_id)
+        if loan is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Loan not found")
+        if loan.member_id != member.id:
+            raise HTTPException(422, "This loan belongs to another member")
+        if loan.status == LoanStatus.CLOSED:
+            raise HTTPException(422, "This loan is already fully repaid")
+
+        repaid = await self._repaid(loan)
+        outstanding = figures_for(loan, repaid).outstanding_paisa
+        if amount_paisa > outstanding:
+            raise HTTPException(
+                422, f"Repayment is more than the outstanding amount of {outstanding} paisa"
+            )
+        sync_status(loan, repaid + amount_paisa)
+
+    async def _repaid(self, loan: Loan) -> int:
+        return (await self.loans.repaid_totals([loan.id])).get(loan.id, 0)
 
     async def _ensure_savings_cover(self, member: Member, amount_paisa: int) -> None:
         totals = await self.repo.totals(member.id)
