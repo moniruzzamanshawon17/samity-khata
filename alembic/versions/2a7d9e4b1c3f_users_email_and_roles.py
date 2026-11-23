@@ -1,5 +1,7 @@
 """users: replace phone with email, roles admin/staff/customer
 
+Revision ID: 2a7d9e4b1c3f
+Revises: 1c79fb3ed6f4
 """
 
 from collections.abc import Sequence

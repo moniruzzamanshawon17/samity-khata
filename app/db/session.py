@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
+import app.db.models  # noqa: F401  (registers every table)
 from app.core.config import get_settings
 
 settings = get_settings()
@@ -21,11 +22,7 @@ engine: AsyncEngine = create_async_engine(
     pool_pre_ping=True,
 )
 
-SessionLocal = async_sessionmaker(
-    engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
-)
+SessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 
 async def get_session() -> AsyncIterator[AsyncSession]:

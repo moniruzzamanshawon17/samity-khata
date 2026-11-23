@@ -1,8 +1,13 @@
+from __future__ import annotations
+
+from collections import defaultdict
 from collections.abc import Sequence
 
-from sqlalchemy import case, func, select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 
+from app.modules.loans.calculations import Payment
 from app.modules.loans.models import OPEN_STATUSES, Loan, LoanStatus
 from app.modules.transactions.models import Transaction, TransactionType
 
@@ -50,20 +55,25 @@ class LoanRepository:
         )
         return result.scalars().all(), total or 0
 
-    async def repaid_totals(self, loan_ids: Sequence[int]) -> dict[int, int]:
-        """Net repayments per loan: repayments minus reversals of repayments."""
+    async def payments(self, loan_ids: Sequence[int]) -> dict[int, list[Payment]]:
+        """Repayments per loan, leaving out any that were reversed."""
         if not loan_ids:
             return {}
-        signed = case(
-            (Transaction.type == TransactionType.REVERSAL, -Transaction.amount_paisa),
-            else_=Transaction.amount_paisa,
-        )
+        reversal = aliased(Transaction)
         result = await self.session.execute(
-            select(Transaction.loan_id, func.sum(signed))
-            .where(Transaction.loan_id.in_(loan_ids))
-            .group_by(Transaction.loan_id)
+            select(Transaction.loan_id, Transaction.occurred_on, Transaction.amount_paisa)
+            .outerjoin(reversal, reversal.reverses_id == Transaction.id)
+            .where(
+                Transaction.loan_id.in_(loan_ids),
+                Transaction.type == TransactionType.REPAYMENT,
+                reversal.id.is_(None),
+            )
+            .order_by(Transaction.occurred_on, Transaction.id)
         )
-        return {loan_id: int(total) for loan_id, total in result.all()}
+        by_loan: dict[int, list[Payment]] = defaultdict(list)
+        for loan_id, occurred_on, amount in result.all():
+            by_loan[loan_id].append(Payment(occurred_on, amount))
+        return dict(by_loan)
 
     async def commit(self) -> None:
         try:

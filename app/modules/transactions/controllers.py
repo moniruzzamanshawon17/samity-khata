@@ -9,9 +9,14 @@ from app.modules.auth.dependencies import AdminUser, CurrentUser, StaffUser
 from app.modules.loans.repositories import LoanRepository
 from app.modules.members.dependencies import AccessibleMember
 from app.modules.members.repositories import MemberRepository
+from app.modules.samities.repositories import SamityRepository
 from app.modules.transactions.models import Transaction
 from app.modules.transactions.repositories import TransactionRepository
-from app.modules.transactions.schemas import BalanceRead, TransactionCreate, TransactionRead
+from app.modules.transactions.schemas import (
+    BalanceRead,
+    TransactionCreate,
+    TransactionRead,
+)
 from app.modules.transactions.services import TransactionService
 
 router = APIRouter(prefix="/transactions", tags=["transactions"])
@@ -20,7 +25,10 @@ balance_router = APIRouter(prefix="/members", tags=["members"])
 
 def get_transaction_service(session: SessionDep) -> TransactionService:
     return TransactionService(
-        TransactionRepository(session), MemberRepository(session), LoanRepository(session)
+        TransactionRepository(session),
+        MemberRepository(session),
+        LoanRepository(session),
+        SamityRepository(session),
     )
 
 
@@ -32,8 +40,9 @@ TransactionServiceDep = Annotated[TransactionService, Depends(get_transaction_se
     response_model=TransactionRead,
     status_code=status.HTTP_201_CREATED,
     responses={
+        403: {"description": "Collectors cannot record withdrawals (Clause 6.2)"},
         404: {"description": "Member or loan not found"},
-        422: {"description": "Bad amount, inactive member, insufficient balance or bad loan"},
+        422: {"description": "Bad amount, withdrawal limit (Clause 3.5) or bad repayment"},
     },
 )
 async def record_transaction(

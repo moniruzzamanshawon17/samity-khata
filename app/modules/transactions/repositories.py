@@ -104,6 +104,19 @@ class TransactionRepository:
         )
         return [(tx, reversed_by) for tx, reversed_by in result.all()], total or 0
 
+    async def last_withdrawal_on(self, member_id: int) -> date | None:
+        """Date of the member's latest withdrawal that wasn't reversed."""
+        reversal = aliased(Transaction)
+        return await self.session.scalar(
+            select(func.max(Transaction.occurred_on))
+            .outerjoin(reversal, reversal.reverses_id == Transaction.id)
+            .where(
+                Transaction.member_id == member_id,
+                Transaction.type == TransactionType.WITHDRAWAL,
+                reversal.id.is_(None),
+            )
+        )
+
     async def member_ids_for_user(self, user_id: int) -> Sequence[int]:
         result = await self.session.execute(
             select(Member.id).where(Member.user_id == user_id)

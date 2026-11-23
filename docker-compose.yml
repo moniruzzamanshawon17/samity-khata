@@ -20,7 +20,7 @@ services:
     restart: unless-stopped
 
   embedding:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.8
     container_name: samity-khata-embedding
     command: ["--model-id", "intfloat/multilingual-e5-small"]
     ports:

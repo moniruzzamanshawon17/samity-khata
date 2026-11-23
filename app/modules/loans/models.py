@@ -1,7 +1,16 @@
 from datetime import date
 from enum import StrEnum
 
-from sqlalchemy import BigInteger, CheckConstraint, Date, ForeignKey, Index, Integer, String, text
+from sqlalchemy import (
+    BigInteger,
+    CheckConstraint,
+    Date,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    text,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base, TimeSpent
@@ -22,6 +31,7 @@ class Loan(TimeSpent, Base):
         CheckConstraint("principal_paisa > 0", name="ck_loans_principal_positive"),
         CheckConstraint("annual_rate_bp >= 0", name="ck_loans_rate_not_negative"),
         CheckConstraint("instalment_paisa > 0", name="ck_loans_instalment_positive"),
+        CheckConstraint("term_months IN (6, 12, 18, 24)", name="ck_loans_term_months"),
         CheckConstraint("status IN ('active', 'closed', 'overdue')", name="ck_loans_status"),
         CheckConstraint(
             "(status = 'closed') = (closed_on IS NOT NULL)", name="ck_loans_closed_on"
@@ -42,6 +52,7 @@ class Loan(TimeSpent, Base):
     )
     principal_paisa: Mapped[int] = mapped_column(BigInteger)
     annual_rate_bp: Mapped[int] = mapped_column(Integer)
+    term_months: Mapped[int] = mapped_column(Integer)
     instalment_paisa: Mapped[int] = mapped_column(BigInteger)
     start_on: Mapped[date] = mapped_column(Date)
     status: Mapped[str] = mapped_column(String(10), server_default=LoanStatus.ACTIVE.value)
