@@ -33,9 +33,10 @@ class Settings(BaseSettings):
     JWT_SECRET: str = Field(min_length=32)
     JWT_EXPIRE_MINUTES: int = 60
 
-    # Chat model (optional until you have a key)
+    # Chat model (optional: POST /chat returns 503 until both are set)
     LLM_API_KEY: str | None = None
     LLM_MODEL: str | None = None
+    LLM_MAX_TOOL_STEPS: int = Field(default=6, ge=1, le=10)
 
     # Embeddings (required)
     EMBEDDING_URL: str
@@ -47,6 +48,8 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
     )
+
+
 
 
 @lru_cache

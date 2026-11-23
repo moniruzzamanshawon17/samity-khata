@@ -9,6 +9,7 @@ from app.modules.members.controllers import router as members_router
 from app.modules.samities.controllers import router as samities_router
 from app.modules.transactions.controllers import balance_router
 from app.modules.transactions.controllers import router as transactions_router
+from app.modules.chat.controllers import router as chat_router
 
 API_PREFIX = "/api/v1"
 
@@ -23,6 +24,7 @@ app.include_router(balance_router, prefix=API_PREFIX)
 app.include_router(transactions_router, prefix=API_PREFIX)
 app.include_router(loans_router, prefix=API_PREFIX)
 app.include_router(bylaws_router, prefix=API_PREFIX)
+app.include_router(chat_router, prefix=API_PREFIX)
 
 register_error_handlers(app)
 
