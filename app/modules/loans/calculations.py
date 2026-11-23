@@ -124,3 +124,4 @@ def loan_position(
         closed_on=closed_on,
         excess_paisa=excess,
     )
+

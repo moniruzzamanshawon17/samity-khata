@@ -45,7 +45,7 @@ async def ingest(path: Path, title: str | None, samity_id: int | None) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Ingest a bylaw PDF or Markdown file."
+        description="Ingest a bylaw PDF into the RAG store."
     )
     parser.add_argument("path", type=Path)
     parser.add_argument("--title", help="Defaults to the Markdown title or the file name")

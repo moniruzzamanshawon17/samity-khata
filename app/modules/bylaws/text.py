@@ -11,7 +11,7 @@ CHUNK_OVERLAP = 150
 
 # Sentence ends in English (. ! ?) and Bangla (the dari, "।").
 _SENTENCE_END = re.compile(r"(?<=[.!?।])\s+")
-_BANGLA = re.compile(r"[\u0980-\u09FF]")
+_BANGLA = re.compile(r"[ঀ-৿]")
 _LATIN = re.compile(r"[A-Za-z]")
 
 
@@ -60,7 +60,7 @@ def extract_pdf_text(data: bytes) -> str:
 
 def _normalise(text: str) -> str:
     text = text.replace("\r\n", "\n").replace("\r", "\n")
-    text = re.sub(r"[ \t\u00a0]+", " ", text)
+    text = re.sub(r"[ \t ]+", " ", text)
     text = re.sub(r" *\n *", "\n", text)
     return re.sub(r"\n{3,}", "\n\n", text).strip()
 
