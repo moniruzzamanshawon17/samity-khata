@@ -121,7 +121,7 @@ export function Login() {
               <label className="lbl" htmlFor="pw">
                 {t("Password")}
               </label>
-              <button type="button" className="linkbtn" style={{ minHeight: 24, padding: 0 }} aria-expanded={showHelp} onClick={() => setShowHelp((s) => !s)}>
+              <button type="button" className="linkbtn" style={{ padding: 0 }} aria-expanded={showHelp} onClick={() => setShowHelp((s) => !s)}>
                 {t("Forgot password?")}
               </button>
             </div>

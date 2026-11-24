@@ -167,14 +167,16 @@ export function LoanNew() {
               <div><div className="mut" style={{ fontSize: 13 }}>Monthly instalment</div><div style={{ fontSize: 24, fontWeight: 700 }}>{taka(preview.emi, { decimals: false })}</div></div>
               <div><div className="mut" style={{ fontSize: 13 }}>Total interest ≈</div><div style={{ fontSize: 24, fontWeight: 700 }}>{taka(preview.totalInterest, { decimals: false })}</div></div>
             </div>
-            <table className="t">
-              <thead><tr><th>Month</th><th className="num">Interest</th><th className="num">Principal</th><th className="num">Balance</th></tr></thead>
-              <tbody>
-                {preview.rows.slice(0, 4).map((r) => (
-                  <tr key={r.month}><td>{r.month}</td><td className="num">{taka(r.interest)}</td><td className="num">{taka(r.principal)}</td><td className="num">{taka(r.balance)}</td></tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="tbl-wrap">
+              <table className="t">
+                <thead><tr><th>Month</th><th className="num">Interest</th><th className="num">Principal</th><th className="num">Balance</th></tr></thead>
+                <tbody>
+                  {preview.rows.slice(0, 4).map((r) => (
+                    <tr key={r.month}><td>{r.month}</td><td className="num">{taka(r.interest)}</td><td className="num">{taka(r.principal)}</td><td className="num">{taka(r.balance)}</td></tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
             <div className="mut" style={{ fontSize: 12, marginTop: 8 }}>EMI rounded up to whole taka (Clause 4.7). 1% a month on the remaining principal. The final schedule comes from the server.</div>
           </section>
         </div>

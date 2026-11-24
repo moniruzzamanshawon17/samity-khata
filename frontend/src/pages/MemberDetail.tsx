@@ -197,9 +197,9 @@ export function MemberDetail() {
                       <tr key={tx.id} className={tx.reversed_by_id ? "struck" : tx.type === "reversal" ? "rev" : undefined}>
                         <td data-label="#" className="mut">{tx.id}</td>
                         <td data-label="Date">{dateLabel(tx.occurred_on)}</td>
-                        <td data-label="Type"><TxChip type={tx.type} /></td>
-                        <td data-label="Amount" className="num"><span className="amt">{(tx.type === "reversal" ? "− " : "") + taka(tx.amount_paisa)}</span></td>
-                        <td className="mut nolabel" style={{ fontSize: 13 }}>
+                        <td data-label="Type" className="st"><TxChip type={tx.type} /></td>
+                        <td data-label="Amount" className="num lead"><span className="amt tnum">{(tx.type === "reversal" ? "− " : "") + taka(tx.amount_paisa)}</span></td>
+                        <td data-label="Note" className="mut" style={{ fontSize: 13 }}>
                           {tx.loan_id ? `Loan #${tx.loan_id}` : ""}
                           {tx.reverses_id ? `reverses #${tx.reverses_id}` : ""}
                           {tx.reversed_by_id ? `reversed by #${tx.reversed_by_id}` : ""}
@@ -229,7 +229,7 @@ export function MemberDetail() {
                     <td data-label="Term">{l.term_months} months</td>
                     <td data-label="Started">{dateLabel(l.start_on)}</td>
                     <td data-label="Outstanding" className="num">{taka(l.outstanding_paisa)}</td>
-                    <td data-label="Status"><Chip kind={l.status === "overdue" ? "bad" : l.status === "closed" ? "ok" : "neu"}>{l.status}</Chip></td>
+                    <td data-label="Status" className="st"><Chip kind={l.status === "overdue" ? "bad" : l.status === "closed" ? "ok" : "neu"}>{l.status}</Chip></td>
                   </tr>
                 ))}
                 {loans.length === 0 && (

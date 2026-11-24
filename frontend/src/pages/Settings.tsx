@@ -118,13 +118,13 @@ export function Settings() {
               <h2>Roles &amp; permissions</h2>
             </div>
             <div className="tbl-wrap">
-              <table className="t">
+              <table className="t resp">
                 <thead><tr><th>Role</th><th>Can do</th></tr></thead>
                 <tbody>
                   {ROLES.map((r) => (
                     <tr key={r.role}>
-                      <td><Chip kind={r.chip}>{r.role}</Chip></td>
-                      <td className="mut" style={{ whiteSpace: "normal" }}>{r.can}</td>
+                      <td className="lead"><Chip kind={r.chip}>{r.role}</Chip></td>
+                      <td data-label="Can do" className="mut" style={{ whiteSpace: "normal" }}>{r.can}</td>
                     </tr>
                   ))}
                 </tbody>

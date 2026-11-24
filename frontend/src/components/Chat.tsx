@@ -4,6 +4,7 @@ import { Markdown } from "./Markdown";
 import markUrl from "../assets/brand/samity-khata-mark.svg";
 import { api, ApiError } from "../lib/api";
 import { streamChat } from "../lib/chatStream";
+import { PHONE } from "../lib/useMedia";
 import { useI18n } from "../lib/i18n";
 import type { ChatResponse, ChatTurn, ToolUse } from "../lib/types";
 
@@ -41,6 +42,11 @@ const STEP_TEXT: Record<string, (a: Record<string, unknown>) => string> = {
 
 function stepText(t: ToolUse) {
   return (STEP_TEXT[t.name] ?? (() => `Used ${t.name}`))(t.args ?? {});
+}
+
+/** Scrolls so the newest message sits just above the (sticky) message box. */
+function keepLatestInView() {
+  window.scrollTo({ top: document.documentElement.scrollHeight });
 }
 
 /** "Looked up: …" line under a reply; nothing when no tool was used. */
@@ -132,6 +138,18 @@ export function Chat({
     if (log.scrollHeight > log.clientHeight) log.scrollTo({ top: log.scrollHeight, behavior: "smooth" });
     else window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
   }, [messages, busy, live?.text.length, live?.tools.length]);
+
+  // Phone keyboard: when it opens (the visual viewport shrinks) keep the latest message and the input in view.
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const onResize = () => {
+      const typing = (document.activeElement as HTMLElement | null)?.closest(".composer");
+      if (typing && window.matchMedia(PHONE).matches) keepLatestInView();
+    };
+    vv.addEventListener("resize", onResize);
+    return () => vv.removeEventListener("resize", onResize);
+  }, []);
 
   // Elapsed-seconds counter while waiting.
   useEffect(() => {
@@ -332,6 +350,9 @@ export function Chat({
               value={text}
               onChange={(e) => setText(e.target.value)}
               onKeyDown={onKey}
+              onFocus={() => {
+                if (window.matchMedia(PHONE).matches) setTimeout(keepLatestInView, 300);
+              }}
             />
           </label>
           {busy ? (

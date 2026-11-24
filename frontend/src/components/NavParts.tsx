@@ -108,19 +108,46 @@ export interface MenuItem {
   danger?: boolean;
 }
 
-export function UserMenu({ name, sub, email, items }: { name: string; sub: string; email?: string; items: MenuItem[] }) {
+export function UserMenu({
+  name,
+  sub,
+  email,
+  items,
+  compact,
+  extra,
+}: {
+  name: string;
+  sub: string;
+  email?: string;
+  items: MenuItem[];
+  /** Avatar only (phone top bar). */
+  compact?: boolean;
+  /** Extra controls shown in the menu, e.g. the language switch on phones. */
+  extra?: ReactNode;
+}) {
   const [open, setOpen] = useState(false);
   const ref = useDismiss(open, () => setOpen(false));
   const { t } = useI18n();
   return (
     <div className="tn-pop" ref={ref}>
-      <button type="button" className="tn-user" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+      <button
+        type="button"
+        className={`tn-user${compact ? " compact" : ""}`}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label={compact ? `${name}, account menu` : undefined}
+        onClick={() => setOpen((o) => !o)}
+      >
         <span className="avatar" style={{ width: 34, height: 34 }}>{initials(name)}</span>
-        <span className="tn-user-txt">
-          <b>{name}</b>
-          <span>{sub}</span>
-        </span>
-        <Icon name="chevron" size={16} />
+        {!compact && (
+          <>
+            <span className="tn-user-txt">
+              <b>{name}</b>
+              <span>{sub}</span>
+            </span>
+            <Icon name="chevron" size={16} />
+          </>
+        )}
       </button>
       {open && (
         <div className="tn-menu" role="menu">
@@ -128,6 +155,7 @@ export function UserMenu({ name, sub, email, items }: { name: string; sub: strin
             <b>{name}</b>
             <span>{email ?? sub}</span>
           </div>
+          {extra && <div className="tn-menu-extra">{extra}</div>}
           {items.map((it) =>
             it.to ? (
               <Link key={it.label} to={it.to} role="menuitem" className="tn-mi" onClick={() => setOpen(false)}>
@@ -221,7 +249,7 @@ export function OverdueBell({ compact }: { compact?: boolean }) {
 
 // ---------- Quick member search (Ctrl+K) ----------
 
-export function QuickSearch() {
+export function QuickSearch({ autoFocus }: { autoFocus?: boolean } = {}) {
   const nav = useNavigate();
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
@@ -229,6 +257,10 @@ export function QuickSearch() {
   const inputRef = useRef<HTMLInputElement>(null);
   const ref = useDismiss(open, () => setOpen(false));
   const members = useAsync(loadMembers, []);
+
+  useEffect(() => {
+    if (autoFocus) inputRef.current?.focus();
+  }, [autoFocus]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

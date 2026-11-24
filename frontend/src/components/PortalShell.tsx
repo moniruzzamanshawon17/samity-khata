@@ -38,9 +38,9 @@ export function PortalShell() {
       <div className="portal">
         {/* PC: sidebar */}
         <aside className="side p-side">
-          <NavLink to="/me" className="brand">
+          <NavLink to="/me" className="brand" aria-label="Samity Khata home">
             <img src={markWhiteUrl} alt="" width={36} className="brand-img" />
-            <span>
+            <span className="brand-text">
               <span className="brand-name" style={{ display: "block" }}>Samity Khata</span>
               <span className="brand-sub bn" style={{ display: "block" }}>{t("Member app")}</span>
             </span>
@@ -48,9 +48,16 @@ export function PortalShell() {
           <div className="side-label">Menu</div>
           <nav className="navs" aria-label="Member">
             {TABS.map((tab) => (
-              <NavLink key={tab.to} to={tab.to} end className={({ isActive }) => `nav${isActive ? " active" : ""}`}>
+              <NavLink
+                key={tab.to}
+                to={tab.to}
+                end
+                className={({ isActive }) => `nav${isActive ? " active" : ""}`}
+                aria-label={t(tab.label)}
+                title={t(tab.label)}
+              >
                 <Icon name={tab.icon} />
-                {t(tab.label)}
+                <span className="nav-label">{t(tab.label)}</span>
               </NavLink>
             ))}
           </nav>
@@ -93,6 +100,7 @@ export function PortalShell() {
                 email={user?.email}
                 items={[
                   { label: "History", icon: "list", to: "/me/history" },
+                  { label: "Pricing", icon: "loan", to: "/pricing" },
                   { label: "Ask", icon: "chat", to: "/me/ask" },
                   {
                     label: "Sign out",

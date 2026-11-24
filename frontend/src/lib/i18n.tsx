@@ -102,6 +102,12 @@ const BN: Record<string, string> = {
     "কোনো সদস্য, ঋণ, ব্যালেন্স বা উপবিধির নিয়ম নিয়ে বাংলা বা ইংরেজিতে জিজ্ঞেস করুন। নিয়মের উত্তরে ধারা উল্লেখ থাকে।",
   "This conversation is cleared when you close the tab.": "ট্যাব বন্ধ করলে এই কথোপকথন মুছে যাবে।",
   "Looked up:": "যা দেখা হয়েছে:",
+  "Add member": "সদস্য যোগ করুন",
+  "Edit member": "সদস্যের তথ্য সম্পাদনা",
+  "Member profile": "সদস্যের প্রোফাইল",
+  "New loan": "নতুন ঋণ",
+  "Record a transaction": "লেনদেন লিখুন",
+  "Samity Khata": "সমিতি খাতা",
 };
 
 interface I18n {

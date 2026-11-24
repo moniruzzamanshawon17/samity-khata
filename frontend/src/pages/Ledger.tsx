@@ -120,7 +120,7 @@ export function Ledger() {
                           </span>
                         </td>
                         <td data-label="Date">{dateLabel(tx.occurred_on)}</td>
-                        <td data-label="Type"><TxChip type={tx.type} /></td>
+                        <td data-label="Type" className="st"><TxChip type={tx.type} /></td>
                         <td data-label="Loan">{tx.loan_id ? <Link to={`/loans/${tx.loan_id}`}>#{tx.loan_id}</Link> : <span className="mut">—</span>}</td>
                         <td data-label="Amount" className="num"><span className="amt">{(tx.type === "reversal" ? "− " : "") + taka(tx.amount_paisa)}</span></td>
                         <td data-label="Recorded by" className="mut">{tx.recorded_by === user?.id ? "You" : `User #${tx.recorded_by}`}</td>
@@ -130,7 +130,7 @@ export function Ledger() {
                           {!tx.reverses_id && !tx.reversed_by_id ? <span className="mut">—</span> : null}
                         </td>
                         {is("admin") && (
-                          <td className="nolabel">{reversible && <button className="linkbtn bad" type="button" onClick={() => openReverse(tx)}>Reverse</button>}</td>
+                          <td className="nolabel">{reversible && <button className="linkbtn bad rowact" type="button" onClick={() => openReverse(tx)}>Reverse</button>}</td>
                         )}
                       </tr>
                     );

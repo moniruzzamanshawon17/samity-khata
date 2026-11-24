@@ -149,12 +149,12 @@ export function Members() {
                               <span className="mut">—</span>
                             )}
                           </td>
-                          <td data-label="Status">
+                          <td data-label="Status" className="st">
                             <Chip kind={inactive ? "warn" : "ok"}>{inactive ? "Inactive" : "Active"}</Chip>
                           </td>
                           {is("admin") && (
                             <td className="nolabel">
-                              <Link to={`/members/${m.id}/edit`} style={{ fontSize: 14 }}>
+                              <Link to={`/members/${m.id}/edit`} className="rowact" style={{ fontSize: 14 }}>
                                 Edit
                               </Link>
                             </td>

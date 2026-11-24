@@ -95,7 +95,7 @@ export function Loans() {
                     </td>
                     <td data-label="Outstanding" className="num">{taka(l.outstanding_paisa, { decimals: false })}</td>
                     <td data-label="Next due">{l.status === "closed" ? <span className="mut">closed {dateLabel(l.closed_on)}</span> : dateLabel(l.next_due_on)}</td>
-                    <td data-label="Status"><LoanChip status={l.status} /></td>
+                    <td data-label="Status" className="st"><LoanChip status={l.status} /></td>
                   </tr>
                 );
               })}

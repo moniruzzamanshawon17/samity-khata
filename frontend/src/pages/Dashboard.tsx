@@ -227,7 +227,7 @@ export function Dashboard() {
                         <span className="mut">{m?.member_no}</span>
                       </span>
                     </td>
-                    <td data-label="Type">
+                    <td data-label="Type" className="st">
                       <TxChip type={tx.type} extra={tx.loan_id ? `Loan #${tx.loan_id}` : tx.reverses_id ? `of #${tx.reverses_id}` : undefined} />
                     </td>
                     <td data-label="Amount" className="num">{(tx.type === "reversal" ? "− " : "") + taka(tx.amount_paisa)}</td>

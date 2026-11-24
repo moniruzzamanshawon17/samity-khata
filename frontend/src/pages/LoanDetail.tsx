@@ -110,7 +110,7 @@ export function LoanDetail() {
                       <td data-label="Interest" className="num">{taka(r.interest_paisa)}</td>
                       <td data-label="Principal" className="num">{taka(r.principal_paisa)}</td>
                       <td data-label="Balance after" className="num">{taka(r.balance_after_paisa)}</td>
-                      <td data-label="Status">{chip ? <Chip kind={chip.kind}>{chip.label}</Chip> : <span className="mut">Upcoming</span>}</td>
+                      <td data-label="Status" className="st">{chip ? <Chip kind={chip.kind}>{chip.label}</Chip> : <span className="mut">Upcoming</span>}</td>
                     </tr>
                   );
                 })}
