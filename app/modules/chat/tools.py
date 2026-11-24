@@ -1,15 +1,8 @@
-"""Read-only tools the chat model can call.
-
-Every tool runs as the logged-in user and goes through the same services and
-permission checks as the matching API endpoint, so the model can never see more
-than the user could through the API. Errors come back to the model as data
-({"error": ..., "status": ...}) so it can explain them.
-"""
-
 import logging
 from datetime import date
 from typing import Any
 
+from fastapi import HTTPException
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -101,8 +94,6 @@ SPECS = {
 
 
 def with_taka(value: Any) -> Any:
-    """Add a "..._taka" text next to every "..._paisa" amount, so the model never
-    has to convert units itself."""
     if isinstance(value, dict):
         out: dict[str, Any] = {}
         for key, item in value.items():
@@ -169,6 +160,8 @@ class ChatTools:
         try:
             return await handler(call.args)
         except AppError as exc:
+            return {"error": exc.detail, "status": exc.status_code}
+        except HTTPException as exc:
             return {"error": exc.detail, "status": exc.status_code}
         except (ValueError, TypeError) as exc:
             return {"error": f"Bad arguments: {exc}"}
