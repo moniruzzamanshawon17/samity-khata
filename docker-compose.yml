@@ -55,6 +55,28 @@ services:
         condition: service_started
     restart: unless-stopped
 
+  mcp:
+    build: .
+    container_name: samity-khata-mcp
+    env_file:
+      - .env
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      EMBEDDING_URL: http://embedding:80
+    command: [ "python", "-m", "app.mcp", "--transport", "http", "--host", "0.0.0.0", "--port", "8001" ]
+    volumes:
+      - .:/app
+      - /app/.venv
+    ports:
+      - "${MCP_HOST_PORT:-8003}:8001"
+    depends_on:
+      db:
+        condition: service_healthy
+      api:
+        condition: service_started
+    restart: unless-stopped
+
 volumes:
   postgres_data:
   embedding_cache:

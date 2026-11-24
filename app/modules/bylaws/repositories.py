@@ -52,3 +52,14 @@ class BylawRepository:
             stmt = stmt.where(BylawChunk.document_id.in_(document_ids))
         result = await self.session.execute(stmt.order_by(distance).limit(limit))
         return [(chunk, float(similarity)) for chunk, similarity in result.all()]
+
+    async def get_document(self, document_id: int) -> BylawDocument | None:
+        return await self.session.get(BylawDocument, document_id)
+
+    async def chunks_of(self, document_id: int) -> Sequence[BylawChunk]:
+        result = await self.session.execute(
+            select(BylawChunk)
+            .where(BylawChunk.document_id == document_id)
+            .order_by(BylawChunk.position)
+        )
+        return result.scalars().all()

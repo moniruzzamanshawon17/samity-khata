@@ -38,6 +38,10 @@ class Settings(BaseSettings):
     LLM_MODEL: str | None = None
     LLM_MAX_TOOL_STEPS: int = Field(default=6, ge=1, le=10)
 
+    # MCP server
+    MCP_USER_EMAIL: str | None = None  # HTTP uses the caller's token
+    MCP_PUBLIC_URL: str = "http://localhost:8003"  # where clients reach the HTTP server
+
     # Embeddings (required)
     EMBEDDING_URL: str
     EMBEDDING_DIM: int = 384
