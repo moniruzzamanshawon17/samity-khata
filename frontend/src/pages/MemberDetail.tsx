@@ -4,7 +4,7 @@ import { Alert, Bar, Chip, Loading, Pager, TxChip } from "../components/ui";
 import { api, fetchAll } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { getBalance, loadSamities } from "../lib/data";
-import { dateLabel, initials, monthsBetween, taka } from "../lib/format";
+import { dateLabel, initials, monthsBetween, phone, taka } from "../lib/format";
 import { paidCount } from "../lib/loan";
 import type { Loan, Member, Page, Transaction } from "../lib/types";
 import { useAsync } from "../lib/useAsync";
@@ -130,7 +130,7 @@ export function MemberDetail() {
                 <div>
                   <div className="mut" style={{ fontSize: 13 }}>Next instalment</div>
                   <div style={{ fontWeight: 700, fontSize: 18 }}>
-                    {taka(open.instalment_paisa, { decimals: false })} · {dateLabel(open.next_due_on, "en", false)}
+                    {taka(open.instalment_paisa, { decimals: false })} · {dateLabel(open.next_due_on, undefined, false)}
                   </div>
                 </div>
                 <div>
@@ -156,7 +156,7 @@ export function MemberDetail() {
           <h2 style={{ marginBottom: 14 }}>Profile</h2>
           <dl className="dl">
             <dt>Phone</dt>
-            <dd>{m.phone}</dd>
+            <dd>{phone(m.phone)}</dd>
             <dt>Joined</dt>
             <dd>
               {dateLabel(m.joined_on)} ({months} months)

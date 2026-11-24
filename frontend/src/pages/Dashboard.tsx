@@ -3,7 +3,7 @@ import { Alert, Bar, Chip, Loading, PageHead, TxChip } from "../components/ui";
 import { fetchAll, mapLimit } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { getBalance, loadMembers, loadSamities } from "../lib/data";
-import { dateLabel, greeting, isoOf, taka, todayIso } from "../lib/format";
+import { dateLabel, dateLocale, greeting, isoOf, taka, todayIso } from "../lib/format";
 import { useI18n } from "../lib/i18n";
 import type { Balance, Loan, Member, Transaction } from "../lib/types";
 import { useAsync } from "../lib/useAsync";
@@ -58,7 +58,7 @@ export function Dashboard() {
     const d = new Date(now.getFullYear(), now.getMonth() - 5 + i, 1);
     const key = isoOf(d).slice(0, 7);
     const sum = live.filter((tx) => tx.type !== "withdrawal" && monthKey(tx.occurred_on) === key).reduce((s, tx) => s + tx.amount_paisa, 0);
-    return { key, label: d.toLocaleDateString("en-GB", { month: "short" }), sum, cur: key === thisMonth };
+    return { key, label: d.toLocaleDateString(dateLocale(), { month: "short" }), sum, cur: key === thisMonth };
   });
   const maxMonth = Math.max(1, ...months.map((m) => m.sum));
 
@@ -68,14 +68,14 @@ export function Dashboard() {
   const recent = txns.slice(0, 6);
   const nextTenth = (() => {
     const d = new Date(now.getFullYear(), now.getMonth() + (now.getDate() > 10 ? 1 : 0), 10);
-    return d.toLocaleDateString("en-GB", { day: "numeric", month: "long" });
+    return d.toLocaleDateString(dateLocale(), { day: "numeric", month: "long" });
   })();
 
   return (
     <>
       <PageHead
         title={`${greeting()}, ${user!.name.split(" ")[0]}`}
-        sub={`${now.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })} · next deposit date ${nextTenth}`}
+        sub={`${now.toLocaleDateString(dateLocale(), { weekday: "long", day: "numeric", month: "long", year: "numeric" })} · ${t("next deposit date")} ${nextTenth}`}
       >
         <Link className="btn" to="/assistant">
           Ask assistant
@@ -119,7 +119,7 @@ export function Dashboard() {
       <div className="row mb">
         <section className="card pad" style={{ flex: "2 1 480px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <h2>{now.toLocaleDateString("en-GB", { month: "long" })} collection</h2>
+            <h2>{now.toLocaleDateString(dateLocale(), { month: "long" })} {t("collection")}</h2>
             <Chip>due 10th</Chip>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 28, marginBottom: 16 }}>

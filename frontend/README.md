@@ -21,7 +21,7 @@ npm install
 npm run dev                 # http://localhost:5173
 ```
 
-Demo logins (after `scripts/seed.py`), password `samity-demo-123`: `secretary@example.com`, `collector@example.com`, `rahima@example.com`. The sign-in page fills them in with one click.
+Demo logins (after `scripts/seed.py`), password `samity-demo-123`: `secretary@example.com`, `collector@example.com`, `rahima@example.com`. They are listed here only, not on the sign-in page.
 
 Other scripts: `npm run build` (type-check + production build to `dist/`), `npm run preview` (serve the build with the same API proxy), `npm run typecheck`.
 

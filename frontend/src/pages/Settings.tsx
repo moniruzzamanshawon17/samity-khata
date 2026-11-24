@@ -3,16 +3,16 @@ import { Alert, Chip, Loading, PageHead } from "../components/ui";
 import { api, errorText } from "../lib/api";
 import { ROLE_LABEL, useAuth } from "../lib/auth";
 import { invalidate, loadSamities } from "../lib/data";
-import { takaToPaisa } from "../lib/format";
+import { num, takaToPaisa } from "../lib/format";
+import { PLAN_PRICES } from "../lib/plans";
 import type { BylawDocument, Samity } from "../lib/types";
 import { useAsync } from "../lib/useAsync";
 
-const MCP_URL = (import.meta.env.VITE_MCP_URL as string | undefined) || "http://localhost:8003/mcp";
 
 const ROLES = [
   { role: "Admin (secretary)", chip: "ok" as const, can: "Everything: members, loans, withdrawals, reversals, bylaw upload, settings" },
   { role: "Staff (collector)", chip: "blu" as const, can: "Deposits and repayments only; reads members, ledger and loans" },
-  { role: "Member", chip: "neu" as const, can: "Own savings, loan and history in the member app; 403 on anyone else" },
+  { role: "Member", chip: "neu" as const, can: "Sees only their own records" },
 ];
 
 export function Settings() {
@@ -138,31 +138,9 @@ export function Settings() {
 
         <div className="col-2 stack">
           <section className="card pad">
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-              <h2>Connect an AI client (MCP)</h2>
-              <Chip kind="ok">Read-only</Chip>
-            </div>
-            <p className="mut" style={{ margin: "0 0 14px", fontSize: 14, lineHeight: 1.55 }}>
-              Use Samity Khata from Claude Desktop or any MCP client, with your own permissions.
-            </p>
-            <div className="lbl">HTTP endpoint (Bearer token from login)</div>
-            <code className="code">{MCP_URL}</code>
-            <div className="lbl" style={{ marginTop: 14 }}>Local (stdio)</div>
-            <code className="code">{`MCP_USER_EMAIL=${user?.email ?? "you@example.com"}\npython -m app.mcp`}</code>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 10, marginTop: 16, textAlign: "center" }}>
-              {[["8", "tools"], ["4", "resources"], ["3", "prompts"]].map(([n, l]) => (
-                <div key={l} style={{ padding: 10, borderRadius: 8, background: "var(--surface-2)" }}>
-                  <div style={{ fontSize: 20, fontWeight: 700 }}>{n}</div>
-                  <div className="mut" style={{ fontSize: 12 }}>{l}</div>
-                </div>
-              ))}
-            </div>
-            <div className="mut" style={{ fontSize: 12, marginTop: 10 }}>Prompts: member_summary · explain_rule · loan_eligibility</div>
-          </section>
-          <section className="card pad">
             <h2 style={{ marginBottom: 8 }}>Plan</h2>
-            <div style={{ fontSize: 20, fontWeight: 700 }}>Samity Basic</div>
-            <div className="mut" style={{ fontSize: 14 }}>Monthly subscription per samity</div>
+            <div style={{ fontSize: 20, fontWeight: 700 }}>Samity plan</div>
+            <div className="mut" style={{ fontSize: 14 }}>৳{num(PLAN_PRICES.samity)} / month</div>
             <ul style={{ margin: "12px 0 0", paddingLeft: 18, fontSize: 14, lineHeight: 1.7 }}>
               <li>Members, ledger and loans for one samity</li>
               <li>Bangla + English assistant</li>

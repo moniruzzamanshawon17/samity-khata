@@ -1,5 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import logoUrl from "../assets/brand/samity-khata-logo.svg";
+import markWhiteUrl from "../assets/brand/samity-khata-mark-white.svg";
 import { Icon } from "../components/Icon";
 import { Alert } from "../components/ui";
 import { homeFor, useAuth } from "../lib/auth";
@@ -8,26 +10,17 @@ import { ApiError } from "../lib/api";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const DEMO = [
-  ["secretary@example.com", "admin"],
-  ["collector@example.com", "staff"],
-  ["rahima@example.com", "member"],
-] as const;
-
 export function AuthHero() {
   return (
     <div className="auth-hero">
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <span className="brand-mark" style={{ width: 40, height: 40, borderRadius: 10 }}>
-          <Icon name="logo" size={22} />
+      {/* Dark panel: white mark + app name (the name is the accessible label) */}
+      <Link to="/" className="brand" style={{ padding: 0, alignSelf: "flex-start" }}>
+        <img src={markWhiteUrl} alt="" width={36} className="brand-img" />
+        <span>
+          <span className="brand-name" style={{ display: "block" }}>Samity Khata</span>
+          <span className="brand-sub bn" style={{ display: "block" }}>সমিতি খাতা</span>
         </span>
-        <div>
-          <div style={{ fontWeight: 700, fontSize: 18 }}>Samity Khata</div>
-          <div className="bn" style={{ fontSize: 13, color: "#a9c2b6" }}>
-            সমিতি খাতা
-          </div>
-        </div>
-      </div>
+      </Link>
       <div style={{ maxWidth: 520 }}>
         <h1>The samity's ledger, loans and bylaws, in one place.</h1>
         <p>
@@ -75,6 +68,8 @@ export function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [showPw, setShowPw] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
 
   if (user) return <Navigate to={homeFor(user.role)} replace />;
 
@@ -104,16 +99,10 @@ export function Login() {
       <AuthHero />
       <div className="auth-form-wrap">
         <form className="auth-form" onSubmit={submit} noValidate>
-          {/* Phone only: compact brand in place of the hero panel */}
-          <div className="auth-mbrand">
-            <span className="brand-mark" style={{ width: 52, height: 52, borderRadius: 14 }}>
-              <Icon name="logo" size={28} />
-            </span>
-            <div>
-              <div style={{ fontWeight: 700, fontSize: 22 }}>Samity Khata</div>
-              <div className="bn mut" style={{ fontSize: 14 }}>সমিতি খাতা</div>
-            </div>
-          </div>
+          {/* Full logo above the form (220px desktop, 160px phone — width only, so it never stretches) */}
+          <Link to="/" className="auth-logo">
+            <img src={logoUrl} alt="Samity Khata" />
+          </Link>
           <div>
             <h2 className="auth-h" style={{ fontSize: 28, marginBottom: 6 }}>{t("Sign in")}</h2>
             <p className="mut auth-sub" style={{ margin: 0 }}>
@@ -128,43 +117,40 @@ export function Login() {
             <input className="inp" id="em" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div>
-            <label className="lbl" htmlFor="pw">
-              {t("Password")}
-            </label>
-            <input
-              className="inp"
-              id="pw"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
+              <label className="lbl" htmlFor="pw">
+                {t("Password")}
+              </label>
+              <button type="button" className="linkbtn" style={{ minHeight: 24, padding: 0 }} aria-expanded={showHelp} onClick={() => setShowHelp((s) => !s)}>
+                {t("Forgot password?")}
+              </button>
+            </div>
+            <div className="pw-wrap">
+              <input
+                className="inp"
+                id="pw"
+                type={showPw ? "text" : "password"}
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button type="button" className="pw-toggle" onClick={() => setShowPw((s) => !s)} aria-label={showPw ? "Hide password" : "Show password"} aria-pressed={showPw}>
+                <Icon name={showPw ? "eyeOff" : "eye"} size={18} />
+              </button>
+            </div>
+            {showHelp && (
+              <div className="hint" role="note">
+                {t("Ask your samity secretary to reset your password.")}
+              </div>
+            )}
           </div>
           <button className="btn pri lg" type="submit" disabled={busy || !email || !password}>
-            {busy ? "Signing in…" : t("Sign in")}
+            {busy ? <><span className="spinner" style={{ width: 16, height: 16, margin: 0, borderColor: "rgba(255,255,255,.35)", borderTopColor: "#fff" }} /> {t("Signing in…")}</> : t("Sign in")}
           </button>
-          <p className="mut" style={{ margin: 0, fontSize: 14, textAlign: "center" }}>
-            {t("New member?")} <Link to="/register">{t("Create an account")}</Link>
+          <p className="auth-more">
+            <Link to="/pricing">See plans and pricing</Link>
           </p>
-          <div className="demo">
-            <div style={{ fontWeight: 600, marginBottom: 4 }}>Demo accounts (after running the seed)</div>
-            {DEMO.map(([e, r]) => (
-              <div key={e}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEmail(e);
-                    setPassword("samity-demo-123");
-                  }}
-                >
-                  {e}
-                </button>{" "}
-                · {r}
-              </div>
-            ))}
-            <div className="mut">Password: samity-demo-123 — click an email to fill it in.</div>
-          </div>
           <LangPills />
         </form>
       </div>

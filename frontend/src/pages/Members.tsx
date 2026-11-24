@@ -5,7 +5,7 @@ import { Alert, Chip, Empty, Loading, PageHead, Pager } from "../components/ui";
 import { api, fetchAll, mapLimit } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { getBalance, loadSamities } from "../lib/data";
-import { dateLabel, taka } from "../lib/format";
+import { dateLabel, phone, taka } from "../lib/format";
 import type { Loan, Member, Page } from "../lib/types";
 import { useAsync } from "../lib/useAsync";
 
@@ -132,7 +132,7 @@ export function Members() {
                               </span>
                             </span>
                           </td>
-                          <td data-label="Phone">{m.phone}</td>
+                          <td data-label="Phone">{phone(m.phone)}</td>
                           <td data-label="Joined">{dateLabel(m.joined_on)}</td>
                           <td data-label="Savings" className="num">{b ? taka(b.savings_balance_paisa, { decimals: false }) : "—"}</td>
                           <td data-label="Deposits">

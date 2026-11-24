@@ -206,7 +206,7 @@ export function Collect() {
                       </div>
                       <div className="kv">
                         <span className="mut">Next instalment</span>
-                        <b className="tnum">{taka(loan.instalment_paisa, { decimals: false })} · {dateLabel(loan.next_due_on, "en", false)}</b>
+                        <b className="tnum">{taka(loan.instalment_paisa, { decimals: false })} · {dateLabel(loan.next_due_on, undefined, false)}</b>
                       </div>
                     </>
                   ) : (

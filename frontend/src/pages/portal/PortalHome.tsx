@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Icon } from "../../components/Icon";
 import { Alert, Bar, Loading } from "../../components/ui";
@@ -8,7 +9,7 @@ import { dateLabel, daysUntil, num, taka } from "../../lib/format";
 import { paidCount } from "../../lib/loan";
 import { PortalTx } from "./PortalHistory";
 
-export function PortalHeader({ title, sub, flat }: { title: string; sub?: string; flat?: boolean }) {
+export function PortalHeader({ title, sub, flat, action }: { title: string; sub?: string; flat?: boolean; action?: ReactNode }) {
   const { lang, setLang, t } = useI18n();
   const { logout } = useAuth();
   const nav = useNavigate();
@@ -19,6 +20,9 @@ export function PortalHeader({ title, sub, flat }: { title: string; sub?: string
           <div style={{ fontSize: 20, fontWeight: 700 }}>{title}</div>
           {sub && <div style={{ fontSize: 13, color: "#a9c2b6", marginTop: 2 }}>{sub}</div>}
         </div>
+        <div style={{ display: "flex", gap: 6, alignItems: "center", flex: "none" }}>
+        {/* Page action (e.g. New chat): visible on every screen size */}
+        {action}
         <div className="p-head-actions">
           <button type="button" className="p-chipbtn" onClick={() => setLang(lang === "bn" ? "en" : "bn")}>
             {lang === "bn" ? "EN" : "বাং"}
@@ -35,6 +39,7 @@ export function PortalHeader({ title, sub, flat }: { title: string; sub?: string
             <Icon name="logout" size={14} />
             {t("Sign out")}
           </button>
+        </div>
         </div>
       </div>
     </header>

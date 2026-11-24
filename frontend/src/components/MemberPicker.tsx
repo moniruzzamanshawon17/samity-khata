@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Icon } from "./Icon";
-import { initials } from "../lib/format";
+import { initials, phone } from "../lib/format";
 import type { Member } from "../lib/types";
 
 export function MemberPicker({
@@ -32,7 +32,7 @@ export function MemberPicker({
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontWeight: 600 }}>{value.name}</div>
           <div className="mut" style={{ fontSize: 13 }}>
-            {value.member_no} · {value.phone}
+            {value.member_no} · {phone(value.phone)}
           </div>
         </div>
         <button type="button" className="quick" onClick={() => onChange(null)}>
@@ -60,7 +60,7 @@ export function MemberPicker({
           >
             <b style={{ fontSize: 13, minWidth: 76 }}>{m.member_no}</b>
             <span style={{ flex: 1 }}>{m.name}</span>
-            <span className="mut" style={{ fontSize: 13 }}>{m.phone}</span>
+            <span className="mut" style={{ fontSize: 13 }}>{phone(m.phone)}</span>
           </button>
         ))}
         {matches.length === 0 && <div className="mut" style={{ padding: 12, fontSize: 14 }}>No member matches “{q}”.</div>}

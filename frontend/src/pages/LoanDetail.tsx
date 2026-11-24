@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { Alert, Bar, Chip, Loading, LoanChip } from "../components/ui";
 import { api } from "../lib/api";
-import { dateLabel, taka } from "../lib/format";
+import { dateLabel, phone, taka } from "../lib/format";
 import { paidCount, rowStates, type RowState } from "../lib/loan";
 import type { Loan, LoanSchedule, Member } from "../lib/types";
 import { useAsync } from "../lib/useAsync";
@@ -133,7 +133,7 @@ export function LoanDetail() {
             <dl className="dl">
               <dt>Name</dt><dd><Link to={`/members/${m.id}`}>{m.name}</Link></dd>
               <dt>Member no.</dt><dd>{m.member_no}</dd>
-              <dt>Phone</dt><dd>{m.phone}</dd>
+              <dt>Phone</dt><dd>{phone(m.phone)}</dd>
             </dl>
           </section>
         </div>

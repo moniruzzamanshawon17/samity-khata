@@ -1,10 +1,11 @@
 import { createContext, useContext } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Icon } from "./Icon";
+import markWhiteUrl from "../assets/brand/samity-khata-mark-white.svg";
 import { InfoPill, LangToggle, PageTitle, pageMeta, UserMenu } from "./NavParts";
 import { useAuth } from "../lib/auth";
 import { useI18n } from "../lib/i18n";
-import { dateLabel, daysUntil, taka } from "../lib/format";
+import { dateLabel, daysUntil, phone, taka } from "../lib/format";
 import { useAsync, type AsyncState } from "../lib/useAsync";
 import { loadMyAccount, type MyAccount } from "../lib/data";
 
@@ -38,7 +39,7 @@ export function PortalShell() {
         {/* PC: sidebar */}
         <aside className="side p-side">
           <NavLink to="/me" className="brand">
-            <span className="brand-mark"><Icon name="logo" /></span>
+            <img src={markWhiteUrl} alt="" width={36} className="brand-img" />
             <span>
               <span className="brand-name" style={{ display: "block" }}>Samity Khata</span>
               <span className="brand-sub bn" style={{ display: "block" }}>{t("Member app")}</span>
@@ -53,18 +54,19 @@ export function PortalShell() {
               </NavLink>
             ))}
           </nav>
-          {member && (
-            <div className="side-foot">
+          <div className="side-foot">
+            {member && (
               <div className="samity-card">
                 <div className="side-label" style={{ padding: 0, marginBottom: 6 }}>{t("Member no.")}</div>
                 <div className="samity-name">{member.member_no}</div>
                 <div className="samity-meta">
                   <span>Member since {dateLabel(member.joined_on, locale)}</span>
-                  <span>{member.phone}</span>
+                  <span>{phone(member.phone)}</span>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+            <NavLink to="/pricing" className="side-quiet">Pricing</NavLink>
+          </div>
         </aside>
 
         <div className="phone">

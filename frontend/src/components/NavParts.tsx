@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Icon } from "./Icon";
 import { fetchAll } from "../lib/api";
 import { loadMembers, memberMap } from "../lib/data";
-import { dateLabel, initials, taka } from "../lib/format";
+import { dateLabel, initials, phone, taka } from "../lib/format";
 import { useI18n } from "../lib/i18n";
 import type { Loan, Member } from "../lib/types";
 import { useAsync } from "../lib/useAsync";
@@ -300,7 +300,7 @@ export function QuickSearch() {
               >
                 <b style={{ minWidth: 76, fontSize: 13 }}>{m.member_no}</b>
                 <span style={{ flex: 1, textAlign: "left" }}>{m.name}</span>
-                <span className="mut" style={{ fontSize: 12 }}>{m.phone}</span>
+                <span className="mut" style={{ fontSize: 12 }}>{phone(m.phone)}</span>
               </button>
             ))
           )}

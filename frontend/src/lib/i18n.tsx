@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { setFormatLang } from "./format";
 
 export type Lang = "en" | "bn";
 
@@ -20,6 +21,19 @@ const BN: Record<string, string> = {
   "Create account": "অ্যাকাউন্ট খুলুন",
   "Create an account": "অ্যাকাউন্ট খুলুন",
   "New member?": "নতুন সদস্য?",
+  "Forgot password?": "পাসওয়ার্ড ভুলে গেছেন?",
+  Features: "বৈশিষ্ট্য",
+  "How it works": "কীভাবে কাজ করে",
+  Pricing: "মূল্য",
+  FAQ: "প্রশ্নোত্তর",
+  Questions: "প্রশ্নোত্তর",
+  "See how it works": "কীভাবে কাজ করে দেখুন",
+  "Still running the samity on paper?": "এখনও কাগজের খাতায় সমিতি চালাচ্ছেন?",
+  "Everything a samity needs": "সমিতির যা কিছু দরকার",
+  "One app, three roles": "এক অ্যাপ, তিন ভূমিকা",
+  "Simple pricing": "সহজ মূল্য",
+  "Ask your samity secretary to reset your password.": "পাসওয়ার্ড নতুন করে দিতে সমিতির সম্পাদককে বলুন।",
+  "Signing in…": "সাইন ইন হচ্ছে…",
   Home: "হোম",
   "My loan": "আমার ঋণ",
   History: "লেনদেন",
@@ -60,6 +74,8 @@ const BN: Record<string, string> = {
   "Member no.": "সদস্য নং",
   "Tell the secretary": "সম্পাদককে জানান",
   More: "আরও",
+  "next deposit date": "পরবর্তী জমার তারিখ",
+  collection: "আদায়",
   "Reading your question…": "প্রশ্নটি পড়ছি…",
   "Looking up records and bylaws…": "হিসাব ও উপবিধি খুঁজছি…",
   "Writing the answer…": "উত্তর লিখছি…",
@@ -80,6 +96,12 @@ const BN: Record<string, string> = {
   "Loading…": "লোড হচ্ছে…",
   "Thinking…": "খুঁজছি…",
   "New chat": "নতুন চ্যাট",
+  "Ask in Bangla or English. It can only look things up — never change records — and only what you are allowed to see.":
+    "বাংলা বা ইংরেজিতে জিজ্ঞেস করুন। সহকারী শুধু তথ্য খুঁজে দেখতে পারে — কোনো হিসাব বদলাতে পারে না — আর শুধু সেটুকুই দেখে, যা আপনার দেখার অনুমতি আছে।",
+  "Ask about a member, a loan, a balance or a bylaw rule — in Bangla or English. Answers about rules cite the clause.":
+    "কোনো সদস্য, ঋণ, ব্যালেন্স বা উপবিধির নিয়ম নিয়ে বাংলা বা ইংরেজিতে জিজ্ঞেস করুন। নিয়মের উত্তরে ধারা উল্লেখ থাকে।",
+  "This conversation is cleared when you close the tab.": "ট্যাব বন্ধ করলে এই কথোপকথন মুছে যাবে।",
+  "Looked up:": "যা দেখা হয়েছে:",
 };
 
 interface I18n {
@@ -99,6 +121,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       return "en";
     }
   });
+  // Money, number, phone and date helpers read the language from here.
+  setFormatLang(lang);
   const setLang = useCallback((l: Lang) => {
     setLangState(l);
     try {

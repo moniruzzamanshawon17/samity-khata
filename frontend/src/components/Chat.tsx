@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { Icon } from "./Icon";
 import { Markdown } from "./Markdown";
+import markUrl from "../assets/brand/samity-khata-mark.svg";
 import { api, ApiError } from "../lib/api";
 import { streamChat } from "../lib/chatStream";
 import { useI18n } from "../lib/i18n";
@@ -27,11 +28,29 @@ const TOOL_WORDS: Record<string, string> = {
   search_bylaws: "Searching the bylaws",
 };
 
-export function toolLabel(t: ToolUse): string {
-  const args = Object.entries(t.args ?? {})
-    .map(([k, v]) => `${k}=${typeof v === "string" ? JSON.stringify(v) : String(v)}`)
-    .join(", ");
-  return `${t.name}(${args})`;
+/** One plain sentence per tool call, filled in with the call's arguments. */
+const STEP_TEXT: Record<string, (a: Record<string, unknown>) => string> = {
+  find_members: (a) => `Searched members for “${a.query ?? ""}”`,
+  get_member: (a) => `Opened member ${a.member_id ?? ""}`,
+  get_balance: (a) => `Checked savings of member ${a.member_id ?? ""}`,
+  list_transactions: (a) => `Read the ledger of member ${a.member_id ?? ""}`,
+  get_loans: (a) => `Checked loans of member ${a.member_id ?? ""}`,
+  get_loan_schedule: (a) => `Read the schedule of loan ${a.loan_id ?? ""}`,
+  search_bylaws: () => "Searched the bylaws",
+};
+
+function stepText(t: ToolUse) {
+  return (STEP_TEXT[t.name] ?? (() => `Used ${t.name}`))(t.args ?? {});
+}
+
+/** "Looked up: …" line under a reply; nothing when no tool was used. */
+function LookedUp({ tools, label }: { tools?: ToolUse[]; label: string }) {
+  if (!tools?.length) return null;
+  return (
+    <div className="looked-up">
+      {label} {tools.map(stepText).join(" · ")}
+    </div>
+  );
 }
 
 /** Restores the saved conversation. A question left without a reply (page reloaded
@@ -78,14 +97,15 @@ export function Chat({
   storageKey,
   suggestions,
   showTools = true,
-  onAnswer,
   resetSignal,
+  note,
 }: {
   storageKey: string;
   suggestions: string[];
   showTools?: boolean;
-  onAnswer?: (m: ChatMessage | null) => void;
   resetSignal?: number;
+  /** Small muted text shown directly under the message box. */
+  note?: string;
 }) {
   const { t } = useI18n();
   const [messages, setMessages] = useState<ChatMessage[]>(() => load(storageKey));
@@ -103,9 +123,7 @@ export function Chat({
     } catch {
       /* ignore */
     }
-    const last = [...messages].reverse().find((m) => m.role === "assistant" && !m.error) ?? null;
-    onAnswer?.(last);
-  }, [messages, storageKey, onAnswer]);
+  }, [messages, storageKey]);
 
   // Keep the newest message (and the working indicator) in view.
   useEffect(() => {
@@ -229,7 +247,8 @@ export function Chat({
       <div className="chat-log" ref={logRef} aria-live="polite" aria-busy={busy}>
         {messages.length === 0 && !busy && (
           <div className="mut" style={{ margin: "auto", textAlign: "center", maxWidth: 360, fontSize: 14, lineHeight: 1.6 }}>
-            Ask about a member, a loan, a balance or a bylaw rule — in Bangla or English. Answers about rules cite the clause.
+            <img src={markUrl} alt="" width={56} className="brand-img" style={{ margin: "0 auto 12px" }} />
+            {t("Ask about a member, a loan, a balance or a bylaw rule — in Bangla or English. Answers about rules cite the clause.")}
           </div>
         )}
         {messages.map((m, i) =>
@@ -239,15 +258,6 @@ export function Chat({
             </div>
           ) : (
             <div key={i} className="bot">
-              {showTools && m.tools && m.tools.length > 0 && (
-                <div className="chips">
-                  {m.tools.map((tool, j) => (
-                    <span key={j} className="tool">
-                      {toolLabel(tool)}
-                    </span>
-                  ))}
-                </div>
-              )}
               <div className={`bub${m.error ? " err" : ""}`} style={{ whiteSpace: "normal" }}>
                 <Markdown text={m.content} />
                 {m.error && i === messages.length - 1 && lastQuestion && !busy && (
@@ -266,22 +276,17 @@ export function Chat({
                   ))}
                 </div>
               )}
+              {showTools && <LookedUp tools={m.tools} label={t("Looked up:")} />}
             </div>
           ),
         )}
         {busy && streaming && live && (
           <div className="bot">
-            {showTools && live.tools.length > 0 && (
-              <div className="chips">
-                {live.tools.map((tool, j) => (
-                  <span key={j} className="tool">{toolLabel(tool)}</span>
-                ))}
-              </div>
-            )}
             <div className="bub live" style={{ whiteSpace: "normal" }}>
               <Markdown text={live.text} />
               <span className="caret" aria-hidden="true" />
             </div>
+            {showTools && <LookedUp tools={live.tools} label={t("Looked up:")} />}
             <div style={{ display: "flex", alignItems: "center", gap: 10 }} role="status">
               <span className="spinner" aria-hidden="true" style={{ width: 14, height: 14, margin: 0 }} />
               <span className="mut" style={{ fontSize: 12 }}>{t("Writing the answer…")} {elapsed}s</span>
@@ -291,13 +296,6 @@ export function Chat({
         )}
         {busy && !streaming && (
           <div className="bot" role="status">
-            {showTools && live && live.tools.length > 0 && (
-              <div className="chips">
-                {live.tools.map((tool, j) => (
-                  <span key={j} className="tool">{toolLabel(tool)}</span>
-                ))}
-              </div>
-            )}
             <div className="bub working">
               <span className="spinner" aria-hidden="true" />
               <span style={{ flex: 1, minWidth: 0 }}>
@@ -346,6 +344,7 @@ export function Chat({
             </button>
           )}
         </form>
+        {note && <p className="chat-note">{note}</p>}
       </div>
     </div>
   );

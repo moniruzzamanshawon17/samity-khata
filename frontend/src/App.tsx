@@ -1,11 +1,14 @@
 import type { ReactNode } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { homeFor, useAuth } from "./lib/auth";
+import { useI18n } from "./lib/i18n";
 import type { Role } from "./lib/types";
 import { Loading } from "./components/ui";
 import { AppShell } from "./components/AppShell";
 import { PortalShell } from "./components/PortalShell";
+import { Landing } from "./pages/Landing";
 import { Login } from "./pages/Login";
+import { Pricing } from "./pages/Pricing";
 import { Register } from "./pages/Register";
 import { Dashboard } from "./pages/Dashboard";
 import { Members } from "./pages/Members";
@@ -36,19 +39,27 @@ function Guard({ roles, children }: { roles: Role[]; children: ReactNode }) {
 const STAFF: Role[] = ["admin", "staff"];
 const ADMIN: Role[] = ["admin"];
 
+/** `/` is the public home page when signed out; signed-in staff get the app, members their portal. */
+function RootGate() {
+  const { user, loading } = useAuth();
+  const loc = useLocation();
+  if (loading) return <Loading />;
+  if (!user) return loc.pathname === "/" ? <Landing /> : <Navigate to="/login" replace state={{ from: loc.pathname }} />;
+  if (!STAFF.includes(user.role)) return <Navigate to={homeFor(user.role)} replace />;
+  return <AppShell />;
+}
+
 export function App() {
+  // Subscribing here re-renders every page when EN / বাং changes, so amounts, dates and
+  // phone numbers switch language without reloading any data.
+  useI18n();
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/pricing" element={<Pricing />} />
 
-      <Route
-        element={
-          <Guard roles={STAFF}>
-            <AppShell />
-          </Guard>
-        }
-      >
+      <Route path="/" element={<RootGate />}>
         <Route index element={<Dashboard />} />
         <Route path="members" element={<Members />} />
         <Route path="members/new" element={<Guard roles={ADMIN}><MemberForm /></Guard>} />

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Icon } from "./Icon";
-import { InfoPill, LangToggle, nextTenth, OverdueBell, PageTitle, pageMeta, QuickSearch, UserMenu, type MenuItem } from "./NavParts";
+import markWhiteUrl from "../assets/brand/samity-khata-mark-white.svg";
+import { LangToggle, OverdueBell, PageTitle, pageMeta, QuickSearch, UserMenu, type MenuItem } from "./NavParts";
 import { ROLE_LABEL, useAuth } from "../lib/auth";
 import { useI18n } from "../lib/i18n";
-import { daysUntil, initials, isoOf, taka } from "../lib/format";
+import { initials, taka } from "../lib/format";
 import { useAsync } from "../lib/useAsync";
 import { loadSamities } from "../lib/data";
 import type { Role } from "../lib/types";
@@ -47,8 +48,6 @@ export function AppShell() {
   const more = items.filter((n) => !n.tab);
   const moreActive = more.some((n) => loc.pathname.startsWith(n.to));
   const meta = pageMeta(loc.pathname);
-  const due = nextTenth();
-  const dueIn = daysUntil(isoOf(due));
   const signOut = () => {
     logout();
     nav("/login");
@@ -63,10 +62,8 @@ export function AppShell() {
     <div className="shell">
       {/* ---- PC: sidebar ---- */}
       <aside className="side">
-        <NavLink to="/" className="brand" aria-label="Samity Khata home">
-          <span className="brand-mark">
-            <Icon name="logo" />
-          </span>
+        <NavLink to="/" className="brand">
+          <img src={markWhiteUrl} alt="" width={36} className="brand-img" />
           <span>
             <span className="brand-name" style={{ display: "block" }}>Samity Khata</span>
             <span className="brand-sub bn" style={{ display: "block" }}>সমিতি খাতা</span>
@@ -92,6 +89,7 @@ export function AppShell() {
               </div>
             )}
           </div>
+          <NavLink to="/pricing" className="side-quiet">Pricing</NavLink>
         </div>
       </aside>
 
@@ -101,12 +99,6 @@ export function AppShell() {
           <PageTitle meta={meta} />
           <QuickSearch />
           <div className="tn-right">
-            <InfoPill
-              icon="calendar"
-              label="Next due date"
-              value={`${due.toLocaleDateString("en-GB", { day: "numeric", month: "short" })} · ${dueIn === 0 ? "today" : `${dueIn}d`}`}
-              tone={dueIn <= 3 ? "warn" : undefined}
-            />
             <OverdueBell />
             <LangToggle />
             <span className="tn-sep" aria-hidden="true" />
@@ -117,8 +109,8 @@ export function AppShell() {
         {/* ---- Mobile: top bar ---- */}
         <header className="topbar">
           <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
-            <NavLink to="/" className="brand-mark" style={{ width: 32, height: 32 }} aria-label="Samity Khata home">
-              <Icon name="logo" size={16} />
+            <NavLink to="/" style={{ display: "flex" }}>
+              <img src={markWhiteUrl} alt="Samity Khata" width={32} className="brand-img" />
             </NavLink>
             <div style={{ minWidth: 0 }}>
               <div className="topbar-title">{t(meta.title)}</div>
@@ -171,6 +163,9 @@ export function AppShell() {
                 {t(n.label)}
               </NavLink>
             ))}
+            <NavLink to="/pricing" className="item" style={{ minHeight: 40, fontSize: 14, fontWeight: 500, color: "var(--muted)" }}>
+              Pricing
+            </NavLink>
             <div style={{ display: "flex", gap: 8, padding: "8px 4px 4px" }}>
               <div className="seg" role="group" aria-label="Language" style={{ flex: 1 }}>
                 <button type="button" style={{ flex: 1 }} aria-pressed={lang === "en"} onClick={() => setLang("en")}>English</button>

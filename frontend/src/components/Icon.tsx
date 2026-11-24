@@ -64,13 +64,27 @@ const PATHS: Record<string, JSX.Element> = {
       <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
     </>
   ),
-  chevron: <path d="m6 9 6 6 6-6" />,
+  eye: (
+    <>
+      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
+      <circle cx="12" cy="12" r="3" />
+    </>
+  ),
+  eyeOff: (
+    <>
+      <path d="M9.9 4.24A9.1 9.1 0 0 1 12 4c6.5 0 10 7 10 7a17.6 17.6 0 0 1-2.16 3.19M6.6 6.6A17.5 17.5 0 0 0 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6" />
+      <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24M2 2l20 20" />
+    </>
+  ),
+  chevron:<path d="m6 9 6 6 6-6" />,
   calendar: (
     <>
       <rect x="3" y="4" width="18" height="18" rx="2" />
       <path d="M16 2v4M8 2v4M3 10h18" />
     </>
   ),
+  menu: <path d="M4 6h16M4 12h16M4 18h16" />,
+  close: <path d="M18 6 6 18M6 6l12 12" />,
   more: (
     <>
       <circle cx="5" cy="12" r="1.5" />
