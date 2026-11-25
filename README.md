@@ -138,6 +138,10 @@ The request flows:
 4. **MCP:** client → `/mcp` or stdio → tool, resource or prompt → the same services → database.
 5. **Auth:** register hashes the password (argon2); login issues a JWT with an expiry; each request checks the token and reads the role from the database.
 
+## System Architecture
+
+<img width="3200" height="1800" alt="01-system-architecture" src="https://github.com/user-attachments/assets/92aee4da-2e70-4a46-a60c-fc364175e942" />
+
 ## Quick start
 
 You need **Docker Desktop**, **Node.js 18+** for the frontend, and optionally
