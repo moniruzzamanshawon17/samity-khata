@@ -74,5 +74,3 @@ $RECYCLE.BIN/
 .DS_Store
 ._*
 
-# Local pycharm config
-.mcp.json
