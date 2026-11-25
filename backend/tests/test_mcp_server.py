@@ -1,4 +1,3 @@
-"""MCP server wiring. These need no database: the calls fail before any query."""
 import asyncio
 import time
 
