@@ -113,22 +113,9 @@ The full pricing page is at `/pricing` in the web app.
 | Frontend | React 18, TypeScript, Vite, React Router |
 | Tooling | uv, Docker Compose, pytest |
 
-## Architecture
+## System Architecture
 
-```
-                 ┌──────────────────────────── frontend/ (React + Vite) ────────────────────────────┐
-  Browser  ─────▶│  staff web app · member app · landing · pricing   (EN / বাং, phone → desktop)       │
-                 └───────────────────────────────┬──────────────────────────────────────────────────┘
-                                                 │  /api/v1  (JWT bearer)
-                                                 ▼
-  ┌───────────────────────────────── backend/ (FastAPI) ─────────────────────────────────┐
-  │ controllers ─▶ Depends(session, current user, role) ─▶ services ─▶ repositories ─────┼──▶ PostgreSQL + pgvector
-  │                                                          │                           │
-  │ chat service ─▶ integrations/llm (Gemini) ◀──tool calls──┘ (same services & checks)  │
-  │ bylaw service ─▶ integrations/embeddings (TEI) ──────────────────────────────────────┼──▶ embedding service
-  └───────────────────────────────────────────────────────────────────────────────────────┘
-  MCP server (app/mcp, HTTP /mcp or stdio) ─▶ same tools, services and permission checks
-```
+<img width="3200" height="1800" alt="01-system-architecture" src="https://github.com/user-attachments/assets/92aee4da-2e70-4a46-a60c-fc364175e942" />
 
 The request flows:
 
@@ -138,9 +125,6 @@ The request flows:
 4. **MCP:** client → `/mcp` or stdio → tool, resource or prompt → the same services → database.
 5. **Auth:** register hashes the password (argon2); login issues a JWT with an expiry; each request checks the token and reads the role from the database.
 
-## System Architecture
-
-<img width="3200" height="1800" alt="01-system-architecture" src="https://github.com/user-attachments/assets/92aee4da-2e70-4a46-a60c-fc364175e942" />
 
 ## Quick start
 
