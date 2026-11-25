@@ -7,11 +7,12 @@ member register, monthly deposits, withdrawals, loans and repayments; applies th
 **bylaw** automatically; and lets the secretary, collectors and members ask questions about
 balances and rules in **Bangla or English**, through a chat assistant and an MCP server.
 
-| | |
+| **Resource** | **Link** |
 |---|---|
-| **Live API (Swagger)** | `[YOUR RENDER URL]/docs` |
-| **Video walkthrough** | `[YOUR GOOGLE DRIVE LINK]` |
-| **Source code** | https://github.com/moniruzzamanshawon17/samity-khata |
+| **Live API (Swagger)** | [API Documentation](https://samity-khata.onrender.com/docs) |
+| **Live Website** | [Samity Khata](https://samity-khata-app.onrender.com) |
+| **Video Walkthrough** | [YOUR GOOGLE DRIVE LINK] |
+| **Source Code** | [GitHub Repository](https://github.com/moniruzzamanshawon17/samity-khata) |
 
 ---
 
